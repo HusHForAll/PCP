@@ -1,4 +1,4 @@
-package la01;
+package la01.ej2y3;
 
 class MiHebra extends Thread { // (A)
   //  (B)

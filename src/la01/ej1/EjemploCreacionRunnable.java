@@ -1,4 +1,4 @@
-package la01;
+package la01.ej1;
 
 class MiRun implements Runnable {
   int miId;

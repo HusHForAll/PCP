@@ -1,26 +1,8 @@
-package la01;
+package la01.ej5;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-
-class MiHebra extends Thread {
-  int miId;
-  CuentaIncrementos c;
-
-  public MiHebra( int miId, CuentaIncrementos c ) {
-    this.miId = miId;
-    this.c = c;
-  }
-
-  public void run() {
-    System.out.println( "Hebra: " + miId + " Comenzando incrementos" );
-    for( int i = 0; i < 1000000; i++ ) {
-      c.incrementaContador();
-    }
-    System.out.println( "Hebra: " + miId + " Terminando incrementos" );
-  }
-}
 
 // ===========================================================================
 public class GUIPrimoSencillo {
@@ -90,13 +72,8 @@ public class GUIPrimoSencillo {
               // Validacion del numero
               long numero = Long.parseLong( txfNumero.getText().trim() );
               // Calculo e impresion en el terminal
-              System.out.println( "Examinando numero: " + numero );
-              boolean primo = esPrimo( numero );
-              if( primo ) {
-                System.out.println( "El numero " + numero + " SI es primo." );
-              } else {
-                System.out.println( "El numero " + numero + " NO es primo." );
-              }
+              HebraPrimo hebra = new HebraPrimo( numero );
+              hebra.start();
             } catch( NumberFormatException ex ) {
               txfMensajes.setText( "No es un numero correcto." );
             }
@@ -150,5 +127,23 @@ public class GUIPrimoSencillo {
       }
     }
     return( primo );
+  }
+}
+
+class HebraPrimo extends Thread {
+  long numero;
+
+  public HebraPrimo( long numero ) {
+    this.numero = numero;
+  }
+
+  public void run() {
+    System.out.println( "Examinando numero : " + numero ) ;
+    boolean primo = GUIPrimoSencillo.esPrimo( numero );
+    if( primo ) {
+      System.out.println( "El numero " + numero + " SI es primo." );
+    } else {
+      System.out.println( "El numero " + numero + " NO es primo." );
+    }
   }
 }

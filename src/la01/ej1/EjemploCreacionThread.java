@@ -1,4 +1,4 @@
-package la01;
+package la01.ej1;
 
 class MiHebra extends Thread {
   int miId;
