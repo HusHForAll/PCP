@@ -13,7 +13,7 @@ class MiHebra extends Thread {
 }
 class EjemploCreacionThread {
   public static void main ( String args [ ] ) {
-    new MiHebra( 0 ).run();
-    new MiHebra( 1 ).run();
+    new MiHebra( 0 ).start();
+    new MiHebra( 1 ).start();
   }
 }

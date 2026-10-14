@@ -69,14 +69,14 @@ class EjemploFuncionCostosa {
     inicializaVectorY( vectorY );
     t1 = System.nanoTime();
     // Gestion de hebras para la implementacion paralela ciclica
-    MiHebraCiclica v[] = new MiHebraCiclica[numHebras];
+    MiHebraCiclica vc[] = new MiHebraCiclica[numHebras];
     for (int i = 0; i < numHebras; i++) {
-        v[i] = new MiHebraCiclica(i, numHebras, vectorX, vectorY);
-        v[i].start();
+        vc[i] = new MiHebraCiclica(i, n, numHebras, vectorX, vectorY);
+        vc[i].start();
     }
     for (int i = 0; i < numHebras; i++) {
         try {
-            v[i].join();
+            vc[i].join();
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
@@ -91,13 +91,36 @@ class EjemploFuncionCostosa {
     sumaY = sumaVector( vectorY );
     System.out.println( "Suma del vector X:          " + sumaX );
     System.out.println( "Suma del vector Y:          " + sumaY );
-    /*
+
     //
     // Implementacion paralela por bloques.
     //
-    // (C) ....
-    //
-*/
+    inicializaVectorX( vectorX );
+    inicializaVectorY( vectorY );
+    t1 = System.nanoTime();
+    // Gestion de hebras para la implementacion paralela por bloques
+    MiHebraBloque vb[] = new MiHebraBloque[numHebras];
+    for (int i = 0; i < numHebras; i++) {
+        vb[i] = new MiHebraBloque(i, n, numHebras, vectorX, vectorY);
+        vb[i].start();
+    }
+    for (int i = 0; i < numHebras; i++) {
+        try {
+            vb[i].join();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
+    }
+    t2 = System.nanoTime();
+    tc = ( ( double ) ( t2 - t1 ) ) / 1.0e9;
+    System.out.println( "Tiempo paralela por bloques (seg.):              " + tc );
+    System.out.println( "Incremento paralela por bloques:                 " + (ts / tc) ); // (B)
+    //// imprimeResultado( vectorX, vectorY );
+    // Comprueba el resultado.
+    sumaX = sumaVector( vectorX );
+    sumaY = sumaVector( vectorY );
+    System.out.println( "Suma del vector X:          " + sumaX );
+    System.out.println( "Suma del vector Y:          " + sumaY );
 
     System.out.println( "Fin del programa." );
   }
@@ -153,21 +176,41 @@ class EjemploFuncionCostosa {
 }
 
 // Crea las clases adicionales que sean necesarias
-class MiHebraCiclica extends Thread {
-  int miId, numHebras;
-  double vectorX[], vectorY[];
+class MiHebraCiclica extends Thread{
+  int miId, n, numHebras;
+  double[] vectorX, vectorY;
 
-  MiHebraCiclica(int miId, int numHebras, double vectorX[], double vectorY[]) {
+  public MiHebraCiclica( int miId, int n, int numHebras, double[] vectorX, double[] vectorY ) {
     this.miId = miId;
+    this.n = n;
     this.numHebras = numHebras;
     this.vectorX = vectorX;
     this.vectorY = vectorY;
   }
-
   public void run() {
-    for (int i = miId; i < vectorX.length; i += numHebras) {
-      vectorY[i] = EjemploFuncionCostosa.evaluaFuncion(vectorX[i]);
+    for ( int i = miId; i < n; i += numHebras ) {
+      vectorY[ i ] = EjemploFuncionCostosa.evaluaFuncion( vectorX[ i ] );
     }
   }
 }
 
+class MiHebraBloque extends Thread{
+  int miId, n, numHebras;
+  double[] vectorX, vectorY;
+
+  public MiHebraBloque( int miId, int n, int numHebras, double[] vectorX, double[] vectorY ) {
+    this.miId = miId;
+    this.n = n;
+    this.numHebras = numHebras;
+    this.vectorX = vectorX;
+    this.vectorY = vectorY;
+  }
+  public void run() {
+    int tam = (n + numHebras - 1) / numHebras;
+    int ini = tam * miId;
+    int fin = Math.min(n, ini + tam);
+    for ( int i = ini; i < fin; i++ ) {
+      vectorY[ i ] = EjemploFuncionCostosa.evaluaFuncion( vectorX[ i ] );
+    }
+  }
+}
