@@ -14,11 +14,11 @@ class EjemploNumeroPI {
     long                        t1, t2;
     double                      tSec, tPar;
     Acumula                     a;
-    MiHebraMultAcumulaciones  vt[];
-    MiHebraUnaAcumulacion     vt2[];
+    MiHebraMultAcumulaciones    vt[];
+    MiHebraUnaAcumulacion       vt2[];
     MiHebraMultAcumulacionAtomica vt3[];
     MiHebraUnaAcumulacionAtomica  vt4[];
-    DoubleAdder                 sumaAt;
+    DoubleAdder                   sumaAt;
 
     // Comprobacion de los argumentos de entrada.
     if( args.length != 2 ) {
@@ -332,6 +332,3 @@ class MiHebraUnaAcumulacionAtomica extends Thread {
     sumaAt.add( sumaL );
   }
 }
-
-
-

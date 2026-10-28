@@ -13,7 +13,7 @@ public class GUISecuenciaPrimos {
   JTextField  txfMensajes;
   JButton     btnIniciaSecuencia, btnCancelaSecuencia;
   JSlider     sldEspera;
-//  HebraTrabajadora  t; // Ejercicio 2.2
+  HebraTrabajadora  t; // Ejercicio 2.2
 //  ZonaIntercambio   z; // Ejercicio 2.3
   
   // -------------------------------------------------------------------------
@@ -67,7 +67,7 @@ public class GUISecuenciaPrimos {
     tempPanel.add( new JLabel( "Tiempo de espera: " ) );
     tempPanel.add( sldEspera );
     jpanel.add( tempPanel );
-    
+
     // Activa inicialmente los 2 botones.
     btnIniciaSecuencia.setEnabled( true );  // (A)
     btnCancelaSecuencia.setEnabled( false ); // (B)
@@ -78,6 +78,9 @@ public class GUISecuenciaPrimos {
           // (C)
           btnIniciaSecuencia.setEnabled( false );
           btnCancelaSecuencia.setEnabled( true );
+          // Crea y arranca la hebra trabajadora.
+          t = new HebraTrabajadora( txfMensajes );
+          t.start();
         }
     } );
 
@@ -87,6 +90,11 @@ public class GUISecuenciaPrimos {
           // (D)
           btnCancelaSecuencia.setEnabled( false );
           btnIniciaSecuencia.setEnabled( true );
+          // Detiene la hebra trabajadora.
+          if( t != null ) {
+            t.paraYa();
+            t = null;
+          }
         }
     } );
 
@@ -128,28 +136,49 @@ public class GUISecuenciaPrimos {
   }
 }
 
-/*
+
 // ===========================================================================
 class HebraTrabajadora extends Thread {
 // ===========================================================================
-  // (F) ...
+  // (F)
+  JTextField  txfMensajes;
+  volatile boolean  fin;
 
-  public HebraTrabajadora ( ... ) {
-    // (G) ...
+  public HebraTrabajadora ( JTextField txfMensajes ) {
+    // (G)
+    this.txfMensajes = txfMensajes;
+    this.fin          = false;
   }
 
   // -------------------------------------------------------------------------
   public void paraYa() {
-    // (H) ...
+    // (H)
+    fin = true;
   }
 
   // -------------------------------------------------------------------------
 
   public void run() {
-    // (I) ...
+    // (I)
+    long i = 1L;
+    while( ! fin ) {
+      if( GUISecuenciaPrimos.esPrimo( i ) ) {
+        final long primo = i;
+        try {
+          SwingUtilities.invokeAndWait( new Runnable() {
+            public void run() {
+              txfMensajes.setText( String.valueOf( primo ) );
+            }
+          } );
+        } catch( Exception ex ) {
+          ex.printStackTrace();
+        }
+      }
+      i++;
+    }
   }
 }
-
+/*
 // ===========================================================================
 class ZonaIntercambio {
 // ===========================================================================
